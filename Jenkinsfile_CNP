@@ -1,0 +1,10 @@
+#!groovy
+
+//noinspection GroovyUnusedAssignment
+@Library("Infrastructure") _
+
+def product = 'nfdiv'
+
+withInfraPipeline(product) {
+  enableSlackNotifications('nfdiv-tech')
+}
