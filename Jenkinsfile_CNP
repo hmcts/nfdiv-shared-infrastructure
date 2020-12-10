@@ -4,7 +4,9 @@
 @Library("Infrastructure") _
 
 def product = 'nfdiv'
+def branchesToSync = ['demo', 'perftest', 'ithc']
 
 withInfraPipeline(product) {
+  syncBranchesWithMaster(branchesToSync)
   enableSlackNotifications('nfdiv-tech')
 }
