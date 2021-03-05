@@ -109,8 +109,8 @@ resource "azurerm_monitor_metric_alert" "metric_alert_cpu" {
   description         = "Alert will be triggered when avg utilization is more than 80%"
 
   criteria {
-    metric_namespace = "Insights.Container/nodes"
-    metric_name      = "CpuUsagePercentage"
+    metric_namespace = "Insights/Components/performanceCounters"
+    metric_name      = "processorCpuPercentage"
     aggregation      = "Average"
     operator         = "GreaterThanOrEqual"
     threshold        = 80
