@@ -85,7 +85,7 @@ resource "azurerm_application_insights_web_test" "appinsights-2" {
   count = var.custom_alerts_enabled ? 1 : 0
 }
 
-/* info on options for this block here: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_metric_alert
+// info on options for this block here: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_metric_alert
 resource "azurerm_monitor_metric_alert" "appinsights" {
   name                = "nfdiv-metricalert2"
   resource_group_name = azurerm_resource_group.rg.name
@@ -103,4 +103,4 @@ resource "azurerm_monitor_metric_alert" "appinsights" {
   }
   count = var.custom_alerts_enabled ? 1 : 0
 }
-*/
+
