@@ -88,7 +88,7 @@ resource "azurerm_application_insights_web_test" "appinsights-2" {
 resource "azurerm_monitor_metric_alert" "appinsights" {
   name                = "nfdiv-metricalert2"
   resource_group_name = azurerm_resource_group.rg.name
-  scopes              = [azurerm_application_insights_web_test.appinsights-2[1].id,azurerm_application_insights.appinsights.id]
+  scopes              = [azurerm_application_insights_web_test.appinsights-2[1],azurerm_application_insights.appinsights.id]
   description         = "Action will be triggered when failed locations exceeds 2"
 
   application_insights_web_test_location_availability_criteria {
