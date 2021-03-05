@@ -25,3 +25,8 @@ variable "appinsights_location" {
   default     = "West Europe"
   description = "Location for Application Insights"
 }
+
+variable "custom_alerts_enabled" {
+  description = "If set to true, enable alerts"
+  default = false
+}

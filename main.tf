@@ -45,3 +45,84 @@ resource "azurerm_application_insights" "appinsights" {
     ]
   }
 }
+
+resource "azurerm_monitor_action_group" "appinsights" {
+  name                = "nfdiv-ag1"
+  resource_group_name = azurerm_resource_group.rg.name
+  short_name          = "nfdiv-alerts"
+
+  email_receiver {
+    name          = "sendtoadmin"
+    email_address = "damon.green@hmcts.net"
+  }
+
+  webhook_receiver {
+    name                    = "nfdiv-l-app"
+    service_uri             = "https://prod-00.uksouth.logic.azure.com:443/workflows/92968083557f446bb6acff64ea3afa69/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=FWSXTSNydGuxnZy9q_34_QDp1IIsZeP8yRdpCmLOKc8"
+    use_common_alert_schema = true
+  }
+}
+
+resource "azurerm_application_insights_web_test" "appinsights-2" {
+  name = "nfdiv-webtest"
+  location = var.appinsights_location
+  resource_group_name = azurerm_resource_group.rg.name
+  application_insights_id = azurerm_application_insights.appinsights.id
+  kind = "ping"
+  frequency = 300
+  timeout = 60
+  enabled = true
+  retry_enabled = true
+  geo_locations = [
+    "emea-se-sto-edge",
+    "apac-sg-sin-azr",
+    "us-il-ch1-azr",
+    "emea-gb-db3-azr",
+    "emea-ru-msa-edge"]
+
+  configuration = "<WebTest Name=\"manual1-dg\" Id=\"2723c2f5-fa3a-4ac2-832c-8444bd8f8da5\" Enabled=\"True\"   CssProjectStructure=\"\"         CssIteration=\"\"         Timeout=\"120\"         WorkItemIds=\"\"         xmlns=\"http://microsoft.com/schemas/VisualStudio/TeamTest/2010\"         Description=\"\"         CredentialUserName=\"\"         CredentialPassword=\"\"         PreAuthenticate=\"True\"         Proxy=\"default\"         StopOnError=\"False\"         RecordedResultFile=\"\"         ResultsLocale=\"\">        <Items>        <Request         Method=\"GET\"         Guid=\"a5eb315b-d699-bdd6-e527-43120955cb86\"         Version=\"1.1\"         Url=\"http://www.google.com\"         ThinkTime=\"0\"         Timeout=\"120\"         ParseDependentRequests=\"False\"         FollowRedirects=\"True\"         RecordResult=\"True\"         Cache=\"False\"         ResponseTimeGoal=\"0\"         Encoding=\"utf-8\"         ExpectedHttpStatusCode=\"200\"         ExpectedResponseUrl=\"\"         ReportingName=\"\"         IgnoreHttpStatusCode=\"False\" />        </Items>        </WebTest>"
+  count = var.custom_alerts_enabled ? 1 : 0
+}
+
+// info on options for this block here: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_metric_alert
+resource "azurerm_monitor_metric_alert" "appinsights" {
+  name                = "nfdiv-metricalert2"
+  resource_group_name = azurerm_resource_group.rg.name
+  scopes              = [azurerm_application_insights_web_test.appinsights-2[0].id,azurerm_application_insights.appinsights.id]
+  description         = "Action will be triggered when failed locations exceeds 2"
+
+  application_insights_web_test_location_availability_criteria {
+    web_test_id = azurerm_application_insights_web_test.appinsights-2[0].id
+    component_id = azurerm_application_insights.appinsights.id
+    failed_location_count = 2
+  }
+
+  action {
+    action_group_id = azurerm_monitor_action_group.appinsights.id
+  }
+}
+
+resource "azurerm_monitor_metric_alert" "metric_alert_cpu" {
+  name                = "cpu_alert"
+  resource_group_name = azurerm_resource_group.rg.name
+  scopes              = [azurerm_application_insights.appinsights.id]
+  description         = "Alert will be triggered when avg utilization is more than 80%"
+
+  criteria {
+    metric_namespace = "Insights.Container/nodes"
+    metric_name      = "CpuUsagePercentage"
+    aggregation      = "Average"
+    operator         = "GreaterThanOrEqual"
+    threshold        = 80
+
+    dimension {
+      name     = "Host"
+      operator = "Include"
+      values   = ["*"]
+    }
+  }
+
+  action {
+    action_group_id = azurerm_monitor_action_group.appinsights.id
+  }
+}
