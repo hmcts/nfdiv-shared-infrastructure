@@ -102,27 +102,23 @@ resource "azurerm_monitor_metric_alert" "appinsights" {
   }
 }
 
-resource "azurerm_monitor_metric_alert" "metric_alert_cpu" {
-  name                = "cpu_alert"
+  resource "azurerm_monitor_metric_alert" "metric_alert_exceptions" {
+  name                = "exceptions_alert"
   resource_group_name = azurerm_resource_group.rg.name
   scopes              = [azurerm_application_insights.appinsights.id]
-  description         = "Alert will be triggered when avg utilization is more than 80%"
+  description         = "Alert will be triggered when Exceptions are more than 2 per 5 mins"
 
   criteria {
-    metric_namespace = "Insights/Components/performanceCounters"
-    metric_name      = "processorCpuPercentage"
-    aggregation      = "Average"
+    metric_namespace = "Microsoft.Insights/Components"
+    metric_name      = "performanceCounters/exceptionsPerSecond"
+    aggregation      = "Maximum"
     operator         = "GreaterThanOrEqual"
-    threshold        = 80
+    threshold        = 2
 
-    dimension {
-      name     = "Host"
-      operator = "Include"
-      values   = ["*"]
-    }
   }
 
   action {
     action_group_id = azurerm_monitor_action_group.appinsights.id
   }
+  count = var.custom_alerts_enabled ? 1 : 0  
 }
