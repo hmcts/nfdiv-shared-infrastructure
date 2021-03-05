@@ -23,9 +23,9 @@ module "key-vault" {
   create_managed_identity    = true
 }
 
-data "azurerm_key_vault_secret" "alerts-email" {
+data "azurerm_key_vault_secret" "alerts_email_key" {
   name      = "alerts-email"
-  value = "${data.azurerm_key_vault_secret.alerts-email.value}"
+  value = "${data.azurerm_key_vault_secret.alerts_email_key.value}"
   key_vault_id = "${module.key-vault.key_vault_id}"
 
 }
