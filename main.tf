@@ -88,7 +88,7 @@ resource "azurerm_application_insights_web_test" "appinsights-2" {
 resource "azurerm_monitor_metric_alert" "appinsights" {
   name                = "nfdiv-metricalert2"
   resource_group_name = azurerm_resource_group.rg.name
-  scopes              = [azurerm_application_insights_web_test.appinsights-2.id,azurerm_application_insights.appinsights.id]
+  scopes              = [azurerm_application_insights_web_test.appinsights-2[0].id,azurerm_application_insights.appinsights.id]
   description         = "Action will be triggered when failed locations exceeds 2"
 
   application_insights_web_test_location_availability_criteria {
@@ -102,3 +102,27 @@ resource "azurerm_monitor_metric_alert" "appinsights" {
   }
 }
 
+resource "azurerm_monitor_metric_alert" "metric_alert_cpu" {
+  name                = "cpu_alert"
+  resource_group_name = azurerm_resource_group.rg.name
+  scopes              = [azurerm_kubernetes_cluster.aks.id]
+  description         = "Alert will be triggered when avg utilization is more than 80%"
+
+  criteria {
+    metric_namespace = "Insights.Container/nodes"
+    metric_name      = "CpuUsagePercentage"
+    aggregation      = "Average"
+    operator         = "GreaterThanOrEqual"
+    threshold        = 80
+
+    dimension {
+      name     = "Host"
+      operator = "Include"
+      values   = ["*"]
+    }
+  }
+
+  action {
+    action_group_id = azurerm_monitor_action_group.appinsights.id
+  }
+}
