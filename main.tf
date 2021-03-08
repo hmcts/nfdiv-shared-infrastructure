@@ -59,7 +59,7 @@ resource "azurerm_monitor_action_group" "appinsights" {
 
   email_receiver {
     name          = "sendtoadmin"
-    email_address = data.azurerm_key_vault_secret.alerts-email.value
+    email_address = data.azurerm_key_vault_secret.alerts_email.value
   }
 
   webhook_receiver {
