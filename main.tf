@@ -46,6 +46,12 @@ resource "azurerm_application_insights" "appinsights" {
   }
 }
 
+data "azurerm_key_vault_secret" "alerts_email" {
+  name      = "alerts-email"
+  key_vault_id = module.key-vault.key_vault_id
+}
+
+
 resource "azurerm_monitor_action_group" "appinsights" {
   name                = "nfdiv-ag1"
   resource_group_name = azurerm_resource_group.rg.name
@@ -53,7 +59,7 @@ resource "azurerm_monitor_action_group" "appinsights" {
 
   email_receiver {
     name          = "sendtoadmin"
-    email_address = "damon.green@hmcts.net"
+    email_address = data.azurerm_key_vault_secret.alerts_email.value
   }
 
   webhook_receiver {
