@@ -116,7 +116,7 @@ resource "azurerm_monitor_metric_alert" "appinsights" {
 
   criteria {
     metric_namespace = "Microsoft.Insights/Components"
-    metric_name      = "exceptions/count"
+    metric_name      = "performanceCounters/exceptionsPerSecond"
     aggregation      = "Maximum"
     operator         = "GreaterThanOrEqual"
     threshold        = 2
