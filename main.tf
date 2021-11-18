@@ -98,7 +98,7 @@ resource "azurerm_monitor_action_group" "appinsights" {
 }
 
 resource "azurerm_application_insights_web_test" "insights-2" {
-  name = "nfdiv-webtest"
+  name = "nfdiv-availability-webtest"
   location = var.appinsights_location
   resource_group_name = azurerm_resource_group.rg.name
   application_insights_id = azurerm_application_insights.appinsights.id
