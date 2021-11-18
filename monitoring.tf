@@ -5,7 +5,7 @@ data "azurerm_key_vault_secret" "slack_monitoring_address" {
 }
 
 output "slack_monitoring_address" {
-  value = data.azurerm_key_vault_secret.slack_monitoring_address.value
+  value = data.azurerm_key_vault_secret.slack_monitoring_address
 }
 
 module "nfdiv-fail-alert" {
