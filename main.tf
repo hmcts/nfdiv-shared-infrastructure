@@ -119,7 +119,7 @@ resource "azurerm_application_insights_web_test" "appinsights-2" {
 
   lifecycle {
     ignore_changes = [
-      application_type,
+      tags,
     ]
   }
 }
