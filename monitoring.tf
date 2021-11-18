@@ -1,4 +1,13 @@
 
+data "azurerm_key_vault_secret" "slack_monitoring_address" {
+  name         = "slack-monitoring-address"
+  key_vault_id = module.key-vault.key_vault_id
+}
+
+output "slack_monitoring_address" {
+  value = data.azurerm_key_vault_secret.slack_monitoring_address.value
+}
+
 module "nfdiv-fail-alert" {
   source            = "git@github.com:hmcts/cnp-module-metric-alert"
   location          = azurerm_application_insights.appinsights.location
@@ -27,5 +36,5 @@ module "nfdiv-fail-action-group-slack" {
   action_group_name      = "NFDIV Fail Slack Alert - ${var.env}"
   short_name             = "NFDIV_slack"
   email_receiver_name    = "NFDIV Alerts"
-  email_receiver_address = "no-fault-divorce-moni-aaaafali3ep7d55ec2d5ddsleq@hmcts-dts.slack.com"
+  email_receiver_address = slack_monitoring_address
 }
