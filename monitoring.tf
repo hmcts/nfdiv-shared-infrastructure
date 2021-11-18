@@ -36,5 +36,5 @@ module "nfdiv-fail-action-group-slack" {
   action_group_name      = "NFDIV Fail Slack Alert - ${var.env}"
   short_name             = "NFDIV_slack"
   email_receiver_name    = "NFDIV Alerts"
-  email_receiver_address = slack_monitoring_address
+  email_receiver_address = data.slack_monitoring_address
 }
