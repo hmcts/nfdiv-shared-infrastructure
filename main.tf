@@ -97,7 +97,7 @@ resource "azurerm_monitor_action_group" "appinsights" {
   }
 }
 
-resource "azurerm_application_insights_web_test" "appinsights-2" {
+resource "azurerm_application_insights_web_test" "insights-2" {
   name = "nfdiv-webtest"
   location = var.appinsights_location
   resource_group_name = azurerm_resource_group.rg.name
@@ -128,11 +128,11 @@ resource "azurerm_application_insights_web_test" "appinsights-2" {
 resource "azurerm_monitor_metric_alert" "appinsights" {
   name                = "nfdiv-metricalert2"
   resource_group_name = azurerm_resource_group.rg.name
-  scopes              = [azurerm_application_insights_web_test.appinsights-2[0].id,azurerm_application_insights.appinsights.id]
+  scopes              = [azurerm_application_insights_web_test.insights-2[0].id,azurerm_application_insights.appinsights.id]
   description         = "Action will be triggered when failed locations exceeds 2"
 
   application_insights_web_test_location_availability_criteria {
-    web_test_id = azurerm_application_insights_web_test.appinsights-2[0].id
+    web_test_id = azurerm_application_insights_web_test.insights-2[0].id
     component_id = azurerm_application_insights.appinsights.id
     failed_location_count = 2
   }
