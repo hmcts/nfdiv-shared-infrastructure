@@ -15,10 +15,9 @@ module "nfdiv-fail-alert" {
 
   alert_name                 = "nfdiv-fail-alert"
   alert_desc                 = "Triggers when an NFDIV exception is received in a 5 minute poll."
-  # app_insights_query         = "exceptions | where appName == \"nfdiv-prod\" | sort by timestamp desc"
-  app_insights_query         = "exceptions | sort by timestamp desc"
-  frequency_in_minutes       = 5
-  time_window_in_minutes     = 5
+  app_insights_query         = "requests | where toint(resultCode) >= 400 | sort by timestamp desc"
+  frequency_in_minutes       = 15
+  time_window_in_minutes     = 15
   severity_level             = "3"
   action_group_name          = module.nfdiv-fail-action-group-slack.action_group_name
   custom_email_subject       = "NFDIV Service Exception"
