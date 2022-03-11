@@ -53,6 +53,33 @@ resource "azurerm_key_vault_secret" "AZURE_APPINSIGHTS_KEY_PREVIEW" {
   count = var.env == "aat" ? 1 : 0
 }
 
+data "azurerm_key_vault" "s2s_vault" {
+  name                = "s2s-${var.env}"
+  resource_group_name = "rpe-service-auth-provider-${var.env}"
+}
+
+data "azurerm_key_vault_secret" "nfdiv_case_api_s2s_key" {
+  name         = "microservicekey-nfdiv-case-api"
+  key_vault_id = data.azurerm_key_vault.s2s_vault.id
+}
+
+resource "azurerm_key_vault_secret" "nfdiv_case_api_s2s_secret" {
+  name         = "s2s-case-api-secret"
+  value        = data.azurerm_key_vault_secret.nfdiv_case_api_s2s_key.value
+  key_vault_id = module.key-vault.key_vault_id
+}
+
+data "azurerm_key_vault_secret" "nfdiv_frontend_s2s_key" {
+  name         = "microservicekey-divorce-frontend"
+  key_vault_id = data.azurerm_key_vault.s2s_vault.id
+}
+
+resource "azurerm_key_vault_secret" "nfdiv_frontend_s2s_secret" {
+  name         = "frontend-secret"
+  value        = data.azurerm_key_vault_secret.nfdiv_frontend_s2s_key.value
+  key_vault_id = module.key-vault.key_vault_id
+}
+
 resource "azurerm_application_insights" "appinsights_preview" {
   name                = "${var.product}-appinsights-preview"
   location            = var.appinsights_location
