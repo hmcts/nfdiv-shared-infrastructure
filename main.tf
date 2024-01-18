@@ -37,7 +37,7 @@ module "application_insights" {
   location            = var.appinsights_location
   resource_group_name = azurerm_resource_group.rg.name
   common_tags         = var.common_tags
-  name                = "${var.product}-appinsights-${var.env}"
+  name                = "${var.product}-appinsights"
 }
 
 moved {
@@ -82,13 +82,13 @@ resource "azurerm_key_vault_secret" "nfdiv_frontend_s2s_secret" {
 module "application_insights_preview" {
   source = "git@github.com:hmcts/terraform-module-application-insights?ref=main"
 
-  env                 = var.env
-  product             = var.product
-  location            = var.appinsights_location
-  resource_group_name = azurerm_resource_group.rg.name
-  common_tags         = var.common_tags
-  name                = "${var.product}-appinsights-preview"
-  count               = var.env == "aat" ? 1 : 0
+  env                          = var.env
+  product                      = var.product
+  location                     = var.appinsights_location
+  resource_group_name          = azurerm_resource_group.rg.name
+  common_tags                  = var.common_tags
+  override_name                = "${var.product}-appinsights-preview"
+  count                        = var.env == "aat" ? 1 : 0
 }
 
 moved {
