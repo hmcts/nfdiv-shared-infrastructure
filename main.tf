@@ -25,33 +25,32 @@ module "key-vault" {
 
 resource "azurerm_key_vault_secret" "AZURE_APPINSIGHTS_KEY" {
   name         = "AppInsightsInstrumentationKey"
-  value        = azurerm_application_insights.appinsights.instrumentation_key
+  value        = module.application_insights.instrumentation_key
   key_vault_id = module.key-vault.key_vault_id
 }
 
-resource "azurerm_application_insights" "appinsights" {
-  name                = "${var.product}-appinsights-${var.env}"
+module "application_insights" {
+  source = "git@github.com:hmcts/terraform-module-application-insights?ref=main"
+
+  env                 = var.env
+  product             = var.product
   location            = var.appinsights_location
   resource_group_name = azurerm_resource_group.rg.name
-  application_type    = "web"
-
-  tags = var.common_tags
-
-  lifecycle {
-    ignore_changes = [
-      # Ignore changes to appinsights as otherwise upgrading to the Azure provider 2.x
-      # destroys and re-creates this appinsights instance..
-      application_type,
-    ]
-  }
+  common_tags         = var.common_tags
+  name                = "${var.product}-appinsights-${var.env}"
 }
 
-resource "azurerm_key_vault_secret" "AZURE_APPINSIGHTS_KEY_PREVIEW" {
-  name         = "AppInsightsInstrumentationKey-Preview"
-  value        = azurerm_application_insights.appinsights_preview[0].instrumentation_key
-  key_vault_id = module.key-vault.key_vault_id
-  count = var.env == "aat" ? 1 : 0
+moved {
+  from = azurerm_application_insights.appinsights
+  to   = module.application_insights.azurerm_application_insights.this
 }
+
+# resource "azurerm_key_vault_secret" "AZURE_APPINSIGHTS_KEY_PREVIEW" {
+#   name         = "AppInsightsInstrumentationKey-Preview"
+#   value        = azurerm_application_insights.appinsights_preview[0].instrumentation_key
+#   key_vault_id = module.key-vault.key_vault_id
+#   count = var.env == "aat" ? 1 : 0
+# }
 
 data "azurerm_key_vault" "s2s_vault" {
   name                = "s2s-${var.env}"
@@ -80,23 +79,23 @@ resource "azurerm_key_vault_secret" "nfdiv_frontend_s2s_secret" {
   key_vault_id = module.key-vault.key_vault_id
 }
 
-resource "azurerm_application_insights" "appinsights_preview" {
-  name                = "${var.product}-appinsights-preview"
-  location            = var.appinsights_location
-  resource_group_name = azurerm_resource_group.rg.name
-  application_type    = "web"
-  count = var.env == "aat" ? 1 : 0
+# resource "azurerm_application_insights" "appinsights_preview" {
+#   name                = "${var.product}-appinsights-preview"
+#   location            = var.appinsights_location
+#   resource_group_name = azurerm_resource_group.rg.name
+#   application_type    = "web"
+#   count = var.env == "aat" ? 1 : 0
 
-  tags = var.common_tags
+#   tags = var.common_tags
 
-  lifecycle {
-    ignore_changes = [
-      # Ignore changes to appinsights as otherwise upgrading to the Azure provider 2.x
-      # destroys and re-creates this appinsights instance..
-      application_type,
-    ]
-  }
-}
+#   lifecycle {
+#     ignore_changes = [
+#       # Ignore changes to appinsights as otherwise upgrading to the Azure provider 2.x
+#       # destroys and re-creates this appinsights instance..
+#       application_type,
+#     ]
+#   }
+# }
 
 /*
 data "azurerm_key_vault_secret" "alerts_email" {
@@ -127,7 +126,7 @@ resource "azurerm_monitor_action_group" "appinsights" {
   resource "azurerm_monitor_metric_alert" "metric_alert_exceptions" {
   name                = "exceptions_alert"
   resource_group_name = azurerm_resource_group.rg.name
-  scopes              = [azurerm_application_insights.appinsights.id]
+  scopes              = [module.application_insights.id]
   description         = "Alert will be triggered when Exceptions are more than 2 per 5 mins"
 
   criteria {
