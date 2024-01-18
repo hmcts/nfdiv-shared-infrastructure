@@ -45,12 +45,12 @@ moved {
   to   = module.application_insights.azurerm_application_insights.this
 }
 
-# resource "azurerm_key_vault_secret" "AZURE_APPINSIGHTS_KEY_PREVIEW" {
-#   name         = "AppInsightsInstrumentationKey-Preview"
-#   value        = azurerm_application_insights.appinsights_preview[0].instrumentation_key
-#   key_vault_id = module.key-vault.key_vault_id
-#   count = var.env == "aat" ? 1 : 0
-# }
+resource "azurerm_key_vault_secret" "AZURE_APPINSIGHTS_KEY_PREVIEW" {
+  name         = "AppInsightsInstrumentationKey-Preview"
+  value        = azurerm_application_insights.appinsights_preview[0].instrumentation_key
+  key_vault_id = module.key-vault.key_vault_id
+  count = var.env == "aat" ? 1 : 0
+}
 
 data "azurerm_key_vault" "s2s_vault" {
   name                = "s2s-${var.env}"
@@ -77,6 +77,23 @@ resource "azurerm_key_vault_secret" "nfdiv_frontend_s2s_secret" {
   name         = "frontend-secret"
   value        = data.azurerm_key_vault_secret.nfdiv_frontend_s2s_key.value
   key_vault_id = module.key-vault.key_vault_id
+}
+
+module "application_insights_preview" {
+  source = "git@github.com:hmcts/terraform-module-application-insights?ref=main"
+
+  env                 = var.env
+  product             = var.product
+  location            = var.appinsights_location
+  resource_group_name = azurerm_resource_group.rg.name
+  common_tags         = var.common_tags
+  name                = "${var.product}-appinsights-preview"
+  count               = var.env == "aat" ? 1 : 0
+}
+
+moved {
+  from = azurerm_application_insights.appinsights_preview
+  to   = module.application_insights.azurerm_application_insights.this
 }
 
 # resource "azurerm_application_insights" "appinsights_preview" {
