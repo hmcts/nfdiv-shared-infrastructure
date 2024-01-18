@@ -93,26 +93,8 @@ module "application_insights_preview" {
 
 moved {
   from = azurerm_application_insights.appinsights_preview
-  to   = module.application_insights.azurerm_application_insights.this
+  to   = module.application_insights_preview.azurerm_application_insights.this
 }
-
-# resource "azurerm_application_insights" "appinsights_preview" {
-#   name                = "${var.product}-appinsights-preview"
-#   location            = var.appinsights_location
-#   resource_group_name = azurerm_resource_group.rg.name
-#   application_type    = "web"
-#   count = var.env == "aat" ? 1 : 0
-
-#   tags = var.common_tags
-
-#   lifecycle {
-#     ignore_changes = [
-#       # Ignore changes to appinsights as otherwise upgrading to the Azure provider 2.x
-#       # destroys and re-creates this appinsights instance..
-#       application_type,
-#     ]
-#   }
-# }
 
 /*
 data "azurerm_key_vault_secret" "alerts_email" {
