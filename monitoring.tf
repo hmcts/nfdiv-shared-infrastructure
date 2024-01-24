@@ -11,7 +11,7 @@ output "slack_monitoring_address" {
 
 module "nfdiv-fail-alert" {
   source            = "git@github.com:hmcts/cnp-module-metric-alert"
-  location          = "uksouth"
+  location          = var.appinsights_location
   app_insights_name = module.application_insights.name
 
   alert_name                 = "nfdiv-fail-alert"
@@ -30,7 +30,7 @@ module "nfdiv-fail-alert" {
 
 module "nfdiv-migration-alert" {
   source            = "git@github.com:hmcts/cnp-module-metric-alert"
-  location          = "uksouth"
+  location          = var.appinsights_location
   app_insights_name = module.application_insights.name
 
   alert_name                 = "nfdiv-migration-alert"
