@@ -8,5 +8,5 @@ def branchesToSync = ['demo', 'perftest', 'ithc']
 
 withInfraPipeline(product) {
   syncBranchesWithMaster(branchesToSync)
-  enableSlackNotifications('nfdiv-tech')
+  enableSlackNotifications('no-fault-divorce-builds')
 }
