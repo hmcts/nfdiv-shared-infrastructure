@@ -6,12 +6,13 @@ data "azurerm_key_vault_secret" "slack_monitoring_address" {
 
 output "slack_monitoring_address" {
   value = data.azurerm_key_vault_secret.slack_monitoring_address
+  sensitive = true
 }
 
 module "nfdiv-fail-alert" {
   source            = "git@github.com:hmcts/cnp-module-metric-alert"
-  location          = azurerm_application_insights.appinsights.location
-  app_insights_name = azurerm_application_insights.appinsights.name
+  location          = var.appinsights_location
+  app_insights_name = module.application_insights.name
 
   alert_name                 = "nfdiv-fail-alert"
   alert_desc                 = "Triggers when an NFDIV exception is received in a 5 minute poll."
@@ -29,8 +30,8 @@ module "nfdiv-fail-alert" {
 
 module "nfdiv-migration-alert" {
   source            = "git@github.com:hmcts/cnp-module-metric-alert"
-  location          = azurerm_application_insights.appinsights.location
-  app_insights_name = azurerm_application_insights.appinsights.name
+  location          = var.appinsights_location
+  app_insights_name = module.application_insights.name
 
   alert_name                 = "nfdiv-migration-alert"
   alert_desc                 = "Triggers when a migration fails."
