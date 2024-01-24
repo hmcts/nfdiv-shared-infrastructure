@@ -2,6 +2,8 @@
 data "azurerm_key_vault_secret" "slack_monitoring_address" {
   name         = "slack-monitoring-address"
   key_vault_id = "${module.key-vault.key_vault_id}"
+
+  depends_on = var.environment == "prod" || var.environment == "aat" ? [module.key-vault] : null
 }
 
 output "slack_monitoring_address" {
