@@ -4,7 +4,7 @@ data "azurerm_key_vault_secret" "slack_monitoring_address" {
   key_vault_id = "${module.key-vault.key_vault_id}"
 
   dynamic "depends_on" {
-    for_each = var.environment == "prod" || var.environment == "aat" ? [1] : []
+    for_each = var.env == "prod" || var.environment == "aat" ? [1] : []
     content {
       expression = module.key-vault
     }
