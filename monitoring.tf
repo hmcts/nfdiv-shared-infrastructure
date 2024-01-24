@@ -1,10 +1,4 @@
-locals {
-  allowed_environments = ["aat", "prod"]
-}
-
 data "azurerm_key_vault_secret" "slack_monitoring_address" {
-  for_each = { for env in local.allowed_environments : env => env }
-
   name         = "slack-monitoring-address"
   key_vault_id = "${module.key-vault.key_vault_id}"
 }
@@ -61,5 +55,5 @@ module "nfdiv-fail-action-group-slack" {
   action_group_name      = "NFDIV Fail Slack Alert - ${var.env}"
   short_name             = "NFDIV_slack"
   email_receiver_name    = "NFDIV Alerts"
-  email_receiver_address = "${data.azurerm_key_vault_secret.slack_monitoring_address[var.env].value}"
+  email_receiver_address = "${data.azurerm_key_vault_secret.slack_monitoring_address.value}"
 }
