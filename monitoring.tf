@@ -1,14 +1,12 @@
+locals {
+  allowed_environments = ["aat", "prod"]
+}
 
 data "azurerm_key_vault_secret" "slack_monitoring_address" {
+  for_each = { for env in local.allowed_environments : env => env }
+
   name         = "slack-monitoring-address"
   key_vault_id = "${module.key-vault.key_vault_id}"
-
-  dynamic "depends_on" {
-    for_each = var.env == "prod" || var.env == "aat" ? [1] : []
-    content {
-      expression = module.key-vault
-    }
-  }
 }
 
 output "slack_monitoring_address" {
