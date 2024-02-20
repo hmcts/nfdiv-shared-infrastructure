@@ -79,16 +79,13 @@ resource "azurerm_key_vault_secret" "nfdiv_frontend_s2s_secret" {
   key_vault_id = module.key-vault.key_vault_id
 }
 
-locals {
-  application_insights_enabled = var.env == "aat"
-}
 module "application_insights_preview" {
   source = "git@github.com:hmcts/terraform-module-application-insights?ref=fix-count"
 
   env                 = "preview"
   product             = var.product
   location            = var.appinsights_location
-  resource_group_name = local.application_insights_enabled ? azurerm_resource_group.rg.name : null
+  resource_group_name = azurerm_resource_group.rg.name
   common_tags         = var.common_tags
   override_name       = "${var.product}-appinsights-preview"
 }
@@ -97,13 +94,6 @@ moved {
   from = module.application_insights_preview[0].azurerm_application_insights.this
   to   = module.application_insights_preview.azurerm_application_insights.this
 }
-
-/*
-data "azurerm_key_vault_secret" "alerts_email" {
-  name      = "alerts-email"
-  key_vault_id = module.key-vault.key_vault_id
-}
-*/
 
 resource "azurerm_monitor_action_group" "appinsights" {
   name                = "nfdiv-ag1"
