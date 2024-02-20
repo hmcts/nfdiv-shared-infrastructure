@@ -47,7 +47,7 @@ moved {
 
 resource "azurerm_key_vault_secret" "AZURE_APPINSIGHTS_KEY_PREVIEW" {
   name         = "AppInsightsInstrumentationKey-Preview"
-  value        = module.application_insights_preview.instrumentation_key
+  value        = module.application_insights_preview[0].instrumentation_key
   key_vault_id = module.key-vault.key_vault_id
   count        = var.env == "aat" ? 1 : 0
 }
@@ -80,6 +80,7 @@ resource "azurerm_key_vault_secret" "nfdiv_frontend_s2s_secret" {
 }
 
 module "application_insights_preview" {
+  count  = var.env == "aat" ? 1 : 0
   source = "git@github.com:hmcts/terraform-module-application-insights?ref=fix-count"
 
   env                 = "preview"
@@ -91,8 +92,9 @@ module "application_insights_preview" {
 }
 
 moved {
-  from = module.application_insights_preview[0].azurerm_application_insights.this
-  to   = module.application_insights_preview.azurerm_application_insights.this
+  from = module.application_insights_preview.azurerm_application_insights.this
+  to   = module.application_insights_preview[0].azurerm_application_insights.this
+
 }
 
 resource "azurerm_monitor_action_group" "appinsights" {
