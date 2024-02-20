@@ -83,7 +83,7 @@ locals {
   application_insights_enabled = var.env == "aat"
 }
 module "application_insights_preview" {
-  source = "git@github.com:hmcts/terraform-module-application-insights?ref=main"
+  source = "git@github.com:hmcts/terraform-module-application-insights?ref=fix-count"
 
   env                 = "preview"
   product             = var.product
