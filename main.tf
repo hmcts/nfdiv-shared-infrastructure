@@ -79,13 +79,16 @@ resource "azurerm_key_vault_secret" "nfdiv_frontend_s2s_secret" {
   key_vault_id = module.key-vault.key_vault_id
 }
 
+locals {
+  application_insights_enabled = var.env == "aat"
+}
 module "application_insights_preview" {
-  source = var.env == "aat" ? "git@github.com:hmcts/terraform-module-application-insights?ref=main" : null
+  source = "git@github.com:hmcts/terraform-module-application-insights?ref=main"
 
   env                 = var.env
   product             = var.product
   location            = var.appinsights_location
-  resource_group_name = azurerm_resource_group.rg.name
+  resource_group_name = local.application_insights_enabled ? azurerm_resource_group.rg.name : null
   common_tags         = var.common_tags
   override_name       = "${var.product}-appinsights-preview"
 }
