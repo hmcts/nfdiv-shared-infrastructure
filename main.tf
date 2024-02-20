@@ -85,7 +85,7 @@ locals {
 module "application_insights_preview" {
   source = "git@github.com:hmcts/terraform-module-application-insights?ref=main"
 
-  env                 = var.env
+  env                 = "preview"
   product             = var.product
   location            = var.appinsights_location
   resource_group_name = local.application_insights_enabled ? azurerm_resource_group.rg.name : null
