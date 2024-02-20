@@ -1,4 +1,4 @@
-provider azurerm {
+provider "azurerm" {
   features {}
 }
 
@@ -18,9 +18,9 @@ module "key-vault" {
   resource_group_name = azurerm_resource_group.rg.name
 
   # dcd_platformengineering group object ID
-  product_group_name = "dcd_divorce"
-  common_tags                = var.common_tags
-  create_managed_identity    = true
+  product_group_name      = "dcd_divorce"
+  common_tags             = var.common_tags
+  create_managed_identity = true
 }
 
 resource "azurerm_key_vault_secret" "AZURE_APPINSIGHTS_KEY" {
@@ -47,9 +47,9 @@ moved {
 
 resource "azurerm_key_vault_secret" "AZURE_APPINSIGHTS_KEY_PREVIEW" {
   name         = "AppInsightsInstrumentationKey-Preview"
-  value        = module.application_insights_preview[0].instrumentation_key
+  value        = module.application_insights_preview.instrumentation_key
   key_vault_id = module.key-vault.key_vault_id
-  count = var.env == "aat" ? 1 : 0
+  count        = var.env == "aat" ? 1 : 0
 }
 
 data "azurerm_key_vault" "s2s_vault" {
@@ -79,21 +79,23 @@ resource "azurerm_key_vault_secret" "nfdiv_frontend_s2s_secret" {
   key_vault_id = module.key-vault.key_vault_id
 }
 
+locals {
+  application_insights_enabled = var.env == "aat"
+}
 module "application_insights_preview" {
   source = "git@github.com:hmcts/terraform-module-application-insights?ref=main"
 
-  env                          = var.env
-  product                      = var.product
-  location                     = var.appinsights_location
-  resource_group_name          = azurerm_resource_group.rg.name
-  common_tags                  = var.common_tags
-  override_name                = "${var.product}-appinsights-preview"
-  count                        = var.env == "aat" ? 1 : 0
+  env                 = var.env
+  product             = var.product
+  location            = var.appinsights_location
+  resource_group_name = local.application_insights_enabled ? azurerm_resource_group.rg.name : null
+  common_tags         = var.common_tags
+  override_name       = "${var.product}-appinsights-preview"
 }
 
 moved {
-  from = azurerm_application_insights.appinsights_preview[0]
-  to   = module.application_insights_preview[0].azurerm_application_insights.this
+  from = module.application_insights_preview[0].azurerm_application_insights.this
+  to   = module.application_insights_preview.azurerm_application_insights.this
 }
 
 /*
@@ -109,8 +111,8 @@ resource "azurerm_monitor_action_group" "appinsights" {
   short_name          = "nfdiv-alerts"
 
   email_receiver {
-    name          = "sendtoadmin"
-//    email_address = data.azurerm_key_vault_secret.alerts_email.value
+    name = "sendtoadmin"
+    //    email_address = data.azurerm_key_vault_secret.alerts_email.value
     email_address = "div-support2@HMCTS.NET"
 
   }
@@ -122,7 +124,7 @@ resource "azurerm_monitor_action_group" "appinsights" {
   }
 }
 
-  resource "azurerm_monitor_metric_alert" "metric_alert_exceptions" {
+resource "azurerm_monitor_metric_alert" "metric_alert_exceptions" {
   name                = "exceptions_alert"
   resource_group_name = azurerm_resource_group.rg.name
   scopes              = [module.application_insights.id]
@@ -140,5 +142,5 @@ resource "azurerm_monitor_action_group" "appinsights" {
   action {
     action_group_id = azurerm_monitor_action_group.appinsights.id
   }
-  count = var.custom_alerts_enabled ? 1 : 0  
+  count = var.custom_alerts_enabled ? 1 : 0
 }
