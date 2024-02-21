@@ -81,7 +81,7 @@ resource "azurerm_key_vault_secret" "nfdiv_frontend_s2s_secret" {
 
 module "application_insights_preview" {
   count  = var.env == "aat" ? 1 : 0
-  source = "git@github.com:hmcts/terraform-module-application-insights?ref=fix-count"
+  source = "git@github.com:hmcts/terraform-module-application-insights?ref=main"
 
   env                 = "preview"
   product             = var.product
