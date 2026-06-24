@@ -10,7 +10,7 @@ resource "azurerm_resource_group" "rg" {
 }
 
 module "key-vault" {
-  source              = "git@github.com:hmcts/cnp-module-key-vault?ref=master"
+  source              = "git@github.com:hmcts/cnp-module-key-vault?ref=DTSPO-31965/remove-jenkins-ptl-access"
   product             = var.product
   env                 = var.env
   tenant_id           = var.tenant_id
@@ -21,6 +21,14 @@ module "key-vault" {
   product_group_name      = "dcd_divorce"
   common_tags             = var.common_tags
   create_managed_identity = true
+
+  grant_preview_jenkins_access = var.env == "aat"
+  jenkins_object_id            = data.azurerm_user_assigned_identity.jenkins.principal_id
+}
+
+data "azurerm_user_assigned_identity" "jenkins" {
+  name                = "jenkins-${var.env}-mi"
+  resource_group_name = "managed-identities-${var.env}-rg"
 }
 
 resource "azurerm_key_vault_secret" "AZURE_APPINSIGHTS_KEY" {
@@ -30,7 +38,7 @@ resource "azurerm_key_vault_secret" "AZURE_APPINSIGHTS_KEY" {
 }
 
 module "application_insights" {
-  source = "git@github.com:hmcts/terraform-module-application-insights?ref=main"
+  source = "git@github.com:hmcts/terraform-module-application-insights?ref=4.x"
 
   env                 = var.env
   product             = var.product
@@ -81,7 +89,7 @@ resource "azurerm_key_vault_secret" "nfdiv_frontend_s2s_secret" {
 
 module "application_insights_preview" {
   count  = var.env == "aat" ? 1 : 0
-  source = "git@github.com:hmcts/terraform-module-application-insights?ref=main"
+  source = "git@github.com:hmcts/terraform-module-application-insights?ref=4.x"
 
   env                 = "preview"
   product             = var.product
