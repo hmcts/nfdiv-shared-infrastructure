@@ -23,6 +23,12 @@ module "key-vault" {
   create_managed_identity = true
 
   grant_preview_jenkins_access = var.env == "aat"
+  jenkins_object_id          = data.azurerm_user_assigned_identity.jenkins.principal_id
+}
+
+data "azurerm_user_assigned_identity" "jenkins" {
+  name                = "jenkins-${var.env}-mi"
+  resource_group_name = "managed-identities-${var.env}-rg"
 }
 
 resource "azurerm_key_vault_secret" "AZURE_APPINSIGHTS_KEY" {
