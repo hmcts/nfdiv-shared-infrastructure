@@ -56,4 +56,6 @@ module "nfdiv-fail-action-group-slack" {
   short_name             = "NFDIV_slack"
   email_receiver_name    = "NFDIV Alerts"
   email_receiver_address = "${data.azurerm_key_vault_secret.slack_monitoring_address.value}"
+
+  tags = var.common_tags
 }
