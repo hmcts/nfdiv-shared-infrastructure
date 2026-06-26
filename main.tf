@@ -26,6 +26,12 @@ module "key-vault" {
   jenkins_object_id            = data.azurerm_user_assigned_identity.jenkins.principal_id
 }
 
+data "azurerm_client_config" "current" {}
+import {
+  to = module.key-vault.azurerm_key_vault_access_policy.creator_access_policy[0]
+  id = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/${var.product}-${var.env}/providers/Microsoft.KeyVault/vaults/${var.product}-${var.env}/objectId/${data.azurerm_client_config.current.object_id}"
+}
+
 data "azurerm_user_assigned_identity" "jenkins" {
   name                = "jenkins-${var.env}-mi"
   resource_group_name = "managed-identities-${var.env}-rg"

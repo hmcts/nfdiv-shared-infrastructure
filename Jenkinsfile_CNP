@@ -1,7 +1,7 @@
 #!groovy
 
 //noinspection GroovyUnusedAssignment
-@Library("Infrastructure@2.0.0") _
+@Library("Infrastructure") _
 
 def product = 'nfdiv'
 def branchesToSync = ['demo', 'perftest', 'ithc']
