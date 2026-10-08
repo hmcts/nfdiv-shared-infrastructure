@@ -15,7 +15,7 @@ module "nfdiv-fail-alert" {
 
   alert_name                 = "nfdiv-fail-alert"
   alert_desc                 = "Triggers when an NFDIV exception is received in a 5 minute poll."
-  app_insights_query         = "requests | where toint(resultCode) >= 400 | sort by timestamp desc"
+  app_insights_query         = "exceptions | project timestamp, type, outerMessage | sort by timestamp desc"
   frequency_in_minutes       = 15
   time_window_in_minutes     = 15
   severity_level             = "3"
